@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "==4.0.2"
+bumpversion = "*"
+twine = "*"
+
+[packages]
+semantic-version = "*"
+pytest-cov = "==2.6.0"
+
+[pipenv]
+allow_prereleases = true
+
+[scripts]
+install-solc = "scripts/install_solc.sh"

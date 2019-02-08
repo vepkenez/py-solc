@@ -1,0 +1,102 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - bundle_dependencies-36:
+          filters:
+            tags:
+              only: /.*/
+      - bundle_dependencies-37:
+          filters:
+            tags:
+              only: /.*/
+      - run_tests-36:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - bundle_dependencies-36
+      - run_tests-37:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - bundle_dependencies-37
+
+
+python_36_base: &python_36_base
+    working_directory: ~/py-solc
+    docker:
+      - image: circleci/python:3.6
+
+python_37_base: &python_37_base
+    working_directory: ~/py-solc
+    docker:
+      - image: circleci/python:3.7
+
+
+commands:
+
+  pipenv_install:
+    description: "Install Python dependencies with Pipenv"
+    steps:
+      - checkout
+      - run:
+          name: Install Python Dependencies with Pipenv
+          command: pipenv sync --dev
+      - run:
+          name: Install Solidity Compiler (Pipenv Entrypoint)
+          command: pipenv run install-solc
+
+
+jobs:
+
+  bundle_dependencies-36:
+    <<: *python_36_base
+    steps:
+      - checkout
+      - pipenv_install
+      - run:
+          name: Check PEP 508 Requirements
+          command: pipenv check
+
+  bundle_dependencies-37:
+    <<: *python_37_base
+    steps:
+      - checkout
+      - pipenv_install
+      - run:
+          name: Check PEP 508 Requirements
+          command: pipenv check
+
+  run_tests-36:
+    <<: *python_36_base
+    steps:
+      - checkout
+      - pipenv_install
+      - run:
+          name: PyTest Tests (Python 3.6)
+          command: pipenv run pytest --junitxml=./reports/pytest/python36-results.xml
+          environment:
+            SOLC_RUN_INSTALL_TESTS: 1
+      - store_test_results:
+          path: /reports/pytest
+      - store_artifacts:
+          path: ./htmlcov
+
+  run_tests-37:
+    <<: *python_37_base
+    steps:
+      - checkout
+      - pipenv_install
+      - run:
+          name: PyTest Tests (Python 3.7)
+          command: pipenv run pytest --junitxml=./reports/pytest/python37-results.xml
+          environment:
+            SOLC_RUN_INSTALL_TESTS: 1
+      - store_test_results:
+          path: /reports/pytest
+      - store_artifacts:
+          path: ./htmlcov
