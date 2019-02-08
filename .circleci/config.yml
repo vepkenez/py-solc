@@ -39,17 +39,43 @@ python_37_base: &python_37_base
 
 commands:
 
-  pipenv_install:
-    description: "Install Python dependencies with Pipenv"
+  pip_install:
+    description: "Install Python dependencies with Pip3"
     steps:
       - checkout
       - run:
-          name: Install Python Dependencies with Pipenv
-          command: pipenv sync --dev
-      - run:
-          name: Install Solidity Compiler (Pipenv Entrypoint)
-          command: pipenv run install-solc
+          name: Install Python Dependencies with Pip3
+          command: |
+            pip3 install --user -e .
+            pip3 install --user pytest==4.0.2
+            pip3 install --user pytest-cov==2.6.0
 
+  install_solc:
+    description: "Download the solidity compiler binary"
+    steps:
+      - run:
+          name: Install Solidity Compiler
+          environment:
+            SOLC_VERSION: 0.5.3
+            SOLC_BINARY_INSTALL_PATH: ~/.local/bin/solc
+          command: |
+            wget "https://github.com/ethereum/solidity/releases/download/v0.5.3/solc-static-linux" -O ~/.local/bin/solc
+            chmod +x ~/.local/bin/solc
+
+
+  run_pytest:
+    description: "Run Tests via Pytest"
+    steps:
+      - run:
+          environment:
+            SOLC_RUN_INSTALL_TESTS: 1
+            SOLC_BINARY: ~/.local/bin/solc
+          command: |
+            python3 -m pytest --junitxml=./reports/pytest/python37-results.xml
+      - store_test_results:
+          path: /reports/pytest
+      - store_artifacts:
+          path: ./htmlcov
 
 jobs:
 
@@ -57,46 +83,28 @@ jobs:
     <<: *python_36_base
     steps:
       - checkout
-      - pipenv_install
-      - run:
-          name: Check PEP 508 Requirements
-          command: pipenv check
+      - pip_install
+      - install_solc
 
   bundle_dependencies-37:
     <<: *python_37_base
     steps:
       - checkout
-      - pipenv_install
-      - run:
-          name: Check PEP 508 Requirements
-          command: pipenv check
+      - pip_install
+      - install_solc
 
   run_tests-36:
     <<: *python_36_base
     steps:
       - checkout
-      - pipenv_install
-      - run:
-          name: PyTest Tests (Python 3.6)
-          command: pipenv run pytest --junitxml=./reports/pytest/python36-results.xml
-          environment:
-            SOLC_RUN_INSTALL_TESTS: 1
-      - store_test_results:
-          path: /reports/pytest
-      - store_artifacts:
-          path: ./htmlcov
+      - pip_install
+      - install_solc
+      - run_pytest
 
   run_tests-37:
     <<: *python_37_base
     steps:
       - checkout
-      - pipenv_install
-      - run:
-          name: PyTest Tests (Python 3.7)
-          command: pipenv run pytest --junitxml=./reports/pytest/python37-results.xml
-          environment:
-            SOLC_RUN_INSTALL_TESTS: 1
-      - store_test_results:
-          path: /reports/pytest
-      - store_artifacts:
-          path: ./htmlcov
+      - pip_install
+      - install_solc
+      - run_pytest
