@@ -39,7 +39,6 @@ def solc_wrapper(solc_binary=None,
                  opcodes=None,
                  bin=None,
                  bin_runtime=None,
-                 clone_bin=None,
                  abi=None,
                  interface=None,
                  hashes=None,
@@ -124,9 +123,6 @@ def solc_wrapper(solc_binary=None,
     if bin_runtime:
         command.append('--bin-runtime')
 
-    if clone_bin:
-        command.append('--clone-bin')
-
     if abi:
         command.append('--abi')
 
@@ -146,6 +142,7 @@ def solc_wrapper(solc_binary=None,
         command.append('--formal')
 
     if stdin is not None:
+        command.append('-')
         # solc seems to expects utf-8 from stdin:
         # see Scanner class in Solidity source
         stdin = force_bytes(stdin, 'utf8')
