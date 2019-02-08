@@ -122,11 +122,7 @@ def get_base_install_path(identifier):
             'solc-{0}'.format(identifier),
         )
     else:
-        return os.path.expanduser(os.path.join(
-            '~',
-            '.py-solc',
-            'solc-{0}'.format(identifier),
-        ))
+        return abspath(dirname(dirname(sys.executable)))
 
 
 def get_repository_path(identifier):
