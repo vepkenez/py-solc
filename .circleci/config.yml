@@ -1,0 +1,123 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - bundle_dependencies-36:
+          filters:
+            tags:
+              only: /.*/
+      - bundle_dependencies-37:
+          filters:
+            tags:
+              only: /.*/
+      - run_tests-36:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - bundle_dependencies-36
+      - run_tests-37:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - bundle_dependencies-37
+
+
+python_36_base: &python_36_base
+    working_directory: ~/py-solc
+    docker:
+      - image: circleci/python:3.6
+
+python_37_base: &python_37_base
+    working_directory: ~/py-solc
+    docker:
+      - image: circleci/python:3.7
+
+
+commands:
+
+  pip_install:
+    description: "Install Python dependencies with Pip3"
+    steps:
+      - checkout
+      - run:
+          name: Install Python Dependencies with Pip3
+          command: |
+            pip3 install --user -e .
+            pip3 install --user pytest==4.0.2
+            pip3 install --user pytest-cov==2.6.0
+
+  install_solc:
+    description: "Download the solidity compiler binary"
+    steps:
+      - run:
+          name: Install Solidity Compiler
+          environment:
+            SOLC_VERSION: 0.5.3
+            SOLC_BINARY_INSTALL_PATH: ~/.local/bin/solc
+          command: |
+            wget "https://github.com/ethereum/solidity/releases/download/v0.5.3/solc-static-linux" -O ~/.local/bin/solc
+            chmod +x ~/.local/bin/solc
+
+  run_pytest:
+    description: "Run Tests via Pytest"
+    steps:
+      - run:
+          environment:
+            SOLC_RUN_INSTALL_TESTS: 1
+          command: |
+            export SOLC_BINARY=~/.local/bin/solc
+            python3 -m pytest --junitxml=./reports/pytest/python37-results.xml
+      - store_test_results:
+          path: /reports/pytest
+      - store_artifacts:
+          path: ./htmlcov
+
+jobs:
+
+  bundle_dependencies-36:
+    <<: *python_36_base
+    steps:
+      - checkout
+      - pip_install
+      - install_solc
+      - persist_to_workspace:
+          root: ~/.local/
+          paths:
+            - bin
+            - share
+
+  bundle_dependencies-37:
+    <<: *python_37_base
+    steps:
+      - checkout
+      - pip_install
+      - install_solc
+      - persist_to_workspace:
+          root: ~/.local/
+          paths:
+            - bin
+            - share
+
+  run_tests-36:
+    <<: *python_36_base
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/.local/
+      - pip_install
+      - install_solc
+      - run_pytest
+
+  run_tests-37:
+    <<: *python_37_base
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/.local/
+      - pip_install
+      - install_solc
+      - run_pytest
