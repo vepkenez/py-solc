@@ -62,15 +62,14 @@ commands:
             wget "https://github.com/ethereum/solidity/releases/download/v0.5.3/solc-static-linux" -O ~/.local/bin/solc
             chmod +x ~/.local/bin/solc
 
-
   run_pytest:
     description: "Run Tests via Pytest"
     steps:
       - run:
           environment:
             SOLC_RUN_INSTALL_TESTS: 1
-            SOLC_BINARY: ~/.local/bin/solc
           command: |
+            export SOLC_BINARY=~/.local/bin/solc
             python3 -m pytest --junitxml=./reports/pytest/python37-results.xml
       - store_test_results:
           path: /reports/pytest
@@ -85,6 +84,11 @@ jobs:
       - checkout
       - pip_install
       - install_solc
+      - persist_to_workspace:
+          root: ~/.local/
+          paths:
+            - bin
+            - share
 
   bundle_dependencies-37:
     <<: *python_37_base
@@ -92,11 +96,18 @@ jobs:
       - checkout
       - pip_install
       - install_solc
+      - persist_to_workspace:
+          root: ~/.local/
+          paths:
+            - bin
+            - share
 
   run_tests-36:
     <<: *python_36_base
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/.local/
       - pip_install
       - install_solc
       - run_pytest
@@ -105,6 +116,8 @@ jobs:
     <<: *python_37_base
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/.local/
       - pip_install
       - install_solc
       - run_pytest
