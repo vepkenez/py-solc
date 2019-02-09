@@ -7,13 +7,13 @@ from solc import (
     compile_standard,
 )
 
-from solc.exceptions import ContractsNotFound
+from solc.exceptions import ContractsNotFound, SolcError
 
 
 def test_compile_empty_folder():
     """Execute compile on a folder without contracts."""
 
-    with pytest.raises(ContractsNotFound):
+    with pytest.raises(SolcError):
         compile_files([])
 
 

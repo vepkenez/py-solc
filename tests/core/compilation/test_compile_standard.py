@@ -28,9 +28,11 @@ def test_compile_standard(FOO_SOURCE):
                 'content': FOO_SOURCE,
             },
         },
-        'outputSelection': {
-            "*": {"*": ["evm.bytecode.object"]},
-        },
+        'settings': {
+            'outputSelection': {
+                "*": {"*": ["evm.bytecode.object"]},
+            },
+        }
     })
 
     assert isinstance(result, dict)
@@ -47,9 +49,11 @@ def test_compile_standard_invalid_source(INVALID_SOURCE):
                     'content': INVALID_SOURCE,
                 },
             },
-            'outputSelection': {
-                "*": {"*": ["evm.bytecode.object"]},
-            },
+            'settings': {
+                'outputSelection': {
+                    "*": {"*": ["evm.bytecode.object"]},
+                },
+            }
         })
 
 
@@ -64,9 +68,11 @@ def test_compile_standard_with_dependency(BAR_SOURCE, BAZ_SOURCE):
                 'content': BAZ_SOURCE,
             },
         },
-        'outputSelection': {
-            "*": {"*": ["evm.bytecode.object"]},
-        },
+        'settings': {
+            'outputSelection': {
+                "*": {"*": ["evm.bytecode.object"]},
+            },
+        }
     })
 
     assert isinstance(result, dict)
@@ -87,9 +93,11 @@ def test_compile_standard_with_file_paths(FOO_SOURCE, is_new_key_format, contrac
                 'urls': [source_file_path],
             },
         },
-        'outputSelection': {
-            "*": {"*": ["evm.bytecode.object"]},
-        },
+        'settings': {
+            'outputSelection': {
+                "*": {"*": ["evm.bytecode.object"]},
+            },
+        }
     }, allow_paths=contracts_dir)
 
     assert isinstance(result, dict)

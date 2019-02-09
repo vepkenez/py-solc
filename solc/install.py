@@ -9,34 +9,15 @@ import sys
 import contextlib
 
 import zipfile
+from os.path import dirname, abspath
 
 
-V0_4_1 = 'v0.4.1'
-V0_4_2 = 'v0.4.2'
-V0_4_6 = 'v0.4.6'
-V0_4_7 = 'v0.4.7'
-V0_4_8 = 'v0.4.8'
-V0_4_9 = 'v0.4.9'
-V0_4_11 = 'v0.4.11'
-V0_4_12 = 'v0.4.12'
-V0_4_13 = 'v0.4.13'
-V0_4_14 = 'v0.4.14'
-V0_4_15 = 'v0.4.15'
-V0_4_16 = 'v0.4.16'
-V0_4_17 = 'v0.4.17'
-V0_4_18 = 'v0.4.18'
-V0_4_19 = 'v0.4.19'
-V0_4_20 = 'v0.4.20'
-V0_4_21 = 'v0.4.21'
-V0_4_22 = 'v0.4.22'
-V0_4_23 = 'v0.4.23'
-V0_4_24 = 'v0.4.24'
-V0_4_25 = 'v0.4.25'
-
+V0_5_0 = 'v0.5.0'
+V0_5_1 = 'v0.5.1'
+V0_5_2 = 'v0.5.2'
+V0_5_3 = 'v0.5.3'
 
 LINUX = 'linux'
-OSX = 'darwin'
-WINDOWS = 'win32'
 
 
 #
@@ -55,10 +36,6 @@ def chdir(path):
 def get_platform():
     if sys.platform.startswith('linux'):
         return LINUX
-    elif sys.platform == OSX:
-        return OSX
-    elif sys.platform == WINDOWS:
-        return WINDOWS
     else:
         raise KeyError("Unknown platform: {0}".format(sys.platform))
 
@@ -145,11 +122,7 @@ def get_base_install_path(identifier):
             'solc-{0}'.format(identifier),
         )
     else:
-        return os.path.expanduser(os.path.join(
-            '~',
-            '.py-solc',
-            'solc-{0}'.format(identifier),
-        ))
+        return abspath(dirname(dirname(sys.executable)))
 
 
 def get_repository_path(identifier):
@@ -374,24 +347,6 @@ def build_solc_from_source(identifier):
     chmod_plus_x(executable_path)
 
 
-def install_from_ubuntu_release(identifier):
-    if not is_git_repository(get_repository_path(identifier)):
-        clone_solidity_repository(identifier)
-    install_solc_dependencies(identifier)
-    install_solc_from_ubuntu_release_zip(identifier)
-
-    executable_path = get_executable_path(identifier)
-    print("Succesfully installed solc @ `{0}`".format(executable_path))
-
-
-install_v0_4_1_linux = functools.partial(install_from_ubuntu_release, V0_4_1)
-install_v0_4_2_linux = functools.partial(install_from_ubuntu_release, V0_4_2)
-install_v0_4_6_linux = functools.partial(install_from_ubuntu_release, V0_4_6)
-install_v0_4_7_linux = functools.partial(install_from_ubuntu_release, V0_4_7)
-install_v0_4_8_linux = functools.partial(install_from_ubuntu_release, V0_4_8)
-install_v0_4_9_linux = functools.partial(install_from_ubuntu_release, V0_4_9)
-
-
 def install_from_static_linux(identifier):
     install_solc_from_static_linux(identifier)
 
@@ -399,92 +354,18 @@ def install_from_static_linux(identifier):
     print("Succesfully installed solc @ `{0}`".format(executable_path))
 
 
-install_v0_4_11_linux = functools.partial(install_solc_from_static_linux, V0_4_11)
-install_v0_4_12_linux = functools.partial(install_solc_from_static_linux, V0_4_12)
-install_v0_4_13_linux = functools.partial(install_solc_from_static_linux, V0_4_13)
-install_v0_4_14_linux = functools.partial(install_solc_from_static_linux, V0_4_14)
-install_v0_4_15_linux = functools.partial(install_solc_from_static_linux, V0_4_15)
-install_v0_4_16_linux = functools.partial(install_solc_from_static_linux, V0_4_16)
-install_v0_4_17_linux = functools.partial(install_solc_from_static_linux, V0_4_17)
-install_v0_4_18_linux = functools.partial(install_solc_from_static_linux, V0_4_18)
-install_v0_4_19_linux = functools.partial(install_solc_from_static_linux, V0_4_19)
-install_v0_4_20_linux = functools.partial(install_solc_from_static_linux, V0_4_20)
-install_v0_4_21_linux = functools.partial(install_solc_from_static_linux, V0_4_21)
-install_v0_4_22_linux = functools.partial(install_solc_from_static_linux, V0_4_22)
-install_v0_4_23_linux = functools.partial(install_solc_from_static_linux, V0_4_23)
-install_v0_4_24_linux = functools.partial(install_solc_from_static_linux, V0_4_24)
-install_v0_4_25_linux = functools.partial(install_solc_from_static_linux, V0_4_25)
-
-
-def install_from_source(identifier):
-    if not is_git_repository(get_repository_path(identifier)):
-        clone_solidity_repository(identifier)
-    install_solc_dependencies(identifier)
-    build_solc_from_source(identifier)
-
-    executable_path = get_executable_path(identifier)
-    print("Succesfully installed solc @ `{0}`".format(executable_path))
-
-
-install_v0_4_8_osx = functools.partial(install_from_source, V0_4_8)
-install_v0_4_11_osx = functools.partial(install_from_source, V0_4_11)
-install_v0_4_12_osx = functools.partial(install_from_source, V0_4_12)
-install_v0_4_13_osx = functools.partial(install_from_source, V0_4_13)
-install_v0_4_14_osx = functools.partial(install_from_source, V0_4_14)
-install_v0_4_15_osx = functools.partial(install_from_source, V0_4_15)
-install_v0_4_16_osx = functools.partial(install_from_source, V0_4_16)
-install_v0_4_17_osx = functools.partial(install_from_source, V0_4_17)
-install_v0_4_18_osx = functools.partial(install_from_source, V0_4_18)
-install_v0_4_19_osx = functools.partial(install_from_source, V0_4_19)
-install_v0_4_20_osx = functools.partial(install_from_source, V0_4_20)
-install_v0_4_21_osx = functools.partial(install_from_source, V0_4_21)
-install_v0_4_22_osx = functools.partial(install_from_source, V0_4_22)
-install_v0_4_23_osx = functools.partial(install_from_source, V0_4_23)
-install_v0_4_24_osx = functools.partial(install_from_source, V0_4_24)
-install_v0_4_25_osx = functools.partial(install_from_source, V0_4_25)
+install_v0_5_0_linux = functools.partial(install_solc_from_static_linux, V0_5_0)
+install_v0_5_1_linux = functools.partial(install_solc_from_static_linux, V0_5_1)
+install_v0_5_2_linux = functools.partial(install_solc_from_static_linux, V0_5_2)
+install_v0_5_3_linux = functools.partial(install_solc_from_static_linux, V0_5_3)
 
 
 INSTALL_FUNCTIONS = {
     LINUX: {
-        V0_4_1: install_v0_4_1_linux,
-        V0_4_2: install_v0_4_2_linux,
-        V0_4_6: install_v0_4_6_linux,
-        V0_4_7: install_v0_4_7_linux,
-        V0_4_8: install_v0_4_8_linux,
-        V0_4_9: install_v0_4_9_linux,
-        V0_4_11: install_v0_4_11_linux,
-        V0_4_12: install_v0_4_12_linux,
-        V0_4_13: install_v0_4_13_linux,
-        V0_4_14: install_v0_4_14_linux,
-        V0_4_15: install_v0_4_15_linux,
-        V0_4_16: install_v0_4_16_linux,
-        V0_4_17: install_v0_4_17_linux,
-        V0_4_18: install_v0_4_18_linux,
-        V0_4_19: install_v0_4_19_linux,
-        V0_4_20: install_v0_4_20_linux,
-        V0_4_21: install_v0_4_21_linux,
-        V0_4_22: install_v0_4_22_linux,
-        V0_4_23: install_v0_4_23_linux,
-        V0_4_24: install_v0_4_24_linux,
-        V0_4_25: install_v0_4_25_linux,
-    },
-    OSX: {
-        V0_4_8: install_v0_4_8_osx,
-        V0_4_11: install_v0_4_11_osx,
-        V0_4_12: install_v0_4_12_osx,
-        V0_4_13: install_v0_4_13_osx,
-        V0_4_14: install_v0_4_14_osx,
-        V0_4_15: install_v0_4_15_osx,
-        V0_4_16: install_v0_4_16_osx,
-        V0_4_17: install_v0_4_17_osx,
-        V0_4_18: install_v0_4_18_osx,
-        V0_4_19: install_v0_4_19_osx,
-        V0_4_20: install_v0_4_20_osx,
-        V0_4_21: install_v0_4_21_osx,
-        V0_4_22: install_v0_4_22_osx,
-        V0_4_23: install_v0_4_23_osx,
-        V0_4_24: install_v0_4_24_osx,
-        V0_4_25: install_v0_4_25_osx,
+        V0_5_0: install_v0_5_0_linux,
+        V0_5_1: install_v0_5_1_linux,
+        V0_5_2: install_v0_5_2_linux,
+        V0_5_3: install_v0_5_3_linux,
     }
 }
 

@@ -18,11 +18,13 @@ def test_partial_code_linking():
 
 
 def test_full_code_linking():
-    output = link_code(CODE, {
+    raw_output = link_code(CODE, {
         'TestA': TEST_A_ADDRESS,
         'TestB': TEST_B_ADDRESS,
         'TestC': TEST_C_ADDRESS,
     })
+
+    output, _message = raw_output.splitlines()
     assert '__TestA__' not in output
     assert '__TestB__' not in output
     assert '__TestC__' not in output

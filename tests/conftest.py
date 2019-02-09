@@ -20,7 +20,7 @@ def solc_version():
 
 @pytest.fixture()
 def supported_solc_version(solc_version):
-    if solc_version not in Spec('>=0.4.1,<=0.4.25,!=0.4.10,!=0.4.3,!=0.4.4,!=0.4.5'):
+    if solc_version not in Spec('>=0.5.0'):
         raise AssertionError("Unsupported compiler version: {0}".format(solc_version))
 
     return solc_version
@@ -33,39 +33,26 @@ def is_new_key_format():
 
 @pytest.fixture()
 def FOO_SOURCE(supported_solc_version, solc_version):
-    if solc_version in Spec('<0.4.17'):
-        return textwrap.dedent('''\
-            pragma solidity ^0.4.0;
+    return textwrap.dedent('''\
+        pragma solidity ^0.5.0;
 
-            contract Foo {
-                function Foo() {}
+        contract Foo {
+            constructor() public {}
 
-                function return13() public returns (uint) {
-                    return 13;
-                }
+            function return13() public pure returns (uint) {
+                return 13;
             }
-            ''')
-    else:
-        return textwrap.dedent('''\
-            pragma solidity ^0.4.17;
-
-            contract Foo {
-                function Foo() public {}
-
-                function return13() public pure returns (uint) {
-                    return 13;
-                }
-            }
-            ''')
+        }
+        ''')
 
 
 @pytest.fixture()
 def BAR_SOURCE(supported_solc_version):
     return textwrap.dedent('''\
-        pragma solidity ^0.4.0;
+        pragma solidity ^0.5.0;
 
         contract Bar {
-            function Bar() public {}
+            constructor() public {}
         }
         ''')
 
@@ -73,14 +60,14 @@ def BAR_SOURCE(supported_solc_version):
 @pytest.fixture()
 def BAZ_SOURCE(supported_solc_version):
     return textwrap.dedent('''\
-        pragma solidity ^0.4.0;
+        pragma solidity ^0.5.0;
 
         import "contracts/Bar.sol";
 
         contract Baz is Bar {
-            function Baz() public {}
+            constructor() public {}
 
-            function get_funky() public returns (string) {
+            function get_funky() public returns (string memory) {
                 return "funky";
             }
         }
@@ -90,7 +77,7 @@ def BAZ_SOURCE(supported_solc_version):
 @pytest.fixture()
 def INVALID_SOURCE(supported_solc_version):
     return textwrap.dedent('''\
-        pragma solidity ^0.4.0;
+        pragma solidity ^0.5.0;
         contract Foo {
         ''')
 
