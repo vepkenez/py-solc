@@ -83,6 +83,6 @@ def INVALID_SOURCE(supported_solc_version):
 
 
 def pytest_runtest_setup(item):
-    if (item.get_marker('requires_standard_json') is not None and
+    if (item.get_closest_marker('requires_standard_json') is not None and
         not solc_supports_standard_json_interface()):
         pytest.skip('requires `--standard-json` support')
